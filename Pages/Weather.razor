@@ -1,0 +1,292 @@
+﻿@page "/weather"
+@rendermode InteractiveServer
+@inject HttpClient http
+@inject SupabaseService supabaseService
+@inject NavigationManager nav
+@inject ISnackbar Snackbar
+
+<PageTitle>Weather Forecast</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
+
+    @if (!isReady)
+    {
+        <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+    }
+    else if (!isLoggedIn)
+    {
+        <MudPaper Elevation="4" Class="pa-8 text-center" Style="border-radius:20px;">
+            <MudIcon Icon="@Icons.Material.Filled.Lock"
+                     Color="Color.Warning" Style="font-size:4rem;" />
+            <MudText Typo="Typo.h5" Class="mt-4" Style="font-weight:600;">
+                Please Login First
+            </MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-2">
+                You need to sign in to search weather and save favorites
+            </MudText>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       Href="/login"
+                       StartIcon="@Icons.Material.Filled.Login"
+                       Class="mt-6"
+                       Style="border-radius:12px;">
+                Sign In
+            </MudButton>
+        </MudPaper>
+    }
+    else
+    {
+        <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-2">
+            🌤️ Weather Forecast
+        </MudText>
+        <MudText Typo="Typo.subtitle1" Align="Align.Center" Class="mb-6"
+                 Color="Color.Secondary">
+            Enter a city to get the 5-day weather forecast
+        </MudText>
+
+        <MudPaper Elevation="3" Class="pa-4 mb-6">
+            <MudGrid Justify="Justify.Center">
+                <MudItem xs="9">
+                    <MudTextField @bind-Value="city"
+                                  Label="Enter City Name"
+                                  Variant="Variant.Outlined"
+                                  Placeholder="e.g. London, Bengaluru, Vellore"
+                                  Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Filled.LocationCity"
+                                  FullWidth="true" />
+                </MudItem>
+                <MudItem xs="3">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               FullWidth="true"
+                               Size="Size.Large"
+                               StartIcon="@Icons.Material.Filled.Search"
+                               OnClick="GetWeather">
+                        Search
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+
+        @if (isLoading)
+        {
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-4" />
+            <MudText Align="Align.Center">Fetching weather data...</MudText>
+        }
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <MudAlert Severity="@alertSeverity" Class="mb-4">@message</MudAlert>
+        }
+
+        @if (forecastList != null && forecastList.Count > 0)
+        {
+            <MudText Typo="Typo.h6" Class="mb-3">
+                📍 5-Day Forecast for <strong>@city.ToUpper()</strong>
+            </MudText>
+
+            <MudGrid>
+                @foreach (var item in forecastList)
+                {
+                    <MudItem xs="12" sm="6" md="4" lg="2">
+                        <MudCard Elevation="4" Style="border-radius:16px;">
+                            <MudCardContent>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @item.dt_txt
+                                </MudText>
+                                <MudDivider Class="my-2" />
+                                <MudText Typo="Typo.h5" Color="Color.Primary">
+                                    🌡️ @item.main?.temp °C
+                                </MudText>
+                                <MudText Typo="Typo.body1">
+                                    ☁️ @item.weather?[0]?.main
+                                </MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                    💧 Humidity: @item.main?.humidity%
+                                </MudText>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudItem>
+                }
+            </MudGrid>
+
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Warning"
+                       StartIcon="@Icons.Material.Filled.Star"
+                       Class="mt-6"
+                       OnClick="SaveFavorite">
+                ⭐ Save as Favorite
+            </MudButton>
+        }
+    }
+</MudContainer>
+
+@code {
+    string city = "";
+    string message = "";
+    bool isLoading = false;
+    bool isReady = false;
+    bool isLoggedIn = false;
+    Severity alertSeverity = Severity.Warning;
+    List<ForecastItem>? forecastList;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await supabaseService.Initialize();
+            isLoggedIn = supabaseService.GetUser() != null;
+            isReady = true;
+            StateHasChanged();
+        }
+    }
+
+    async Task GetWeather()
+    {
+        if (string.IsNullOrWhiteSpace(city))
+        {
+            message = "Please enter a city name!";
+            alertSeverity = Severity.Warning;
+            return;
+        }
+
+        isLoading = true;
+        message = "";
+        forecastList = null;
+        StateHasChanged();
+
+        try
+        {
+            var apiKey = "0c96d91b611fac9219a7be00818067bb";
+            var url = $"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={apiKey}&units=metric";
+            var result = await http.GetFromJsonAsync<ForecastResponse>(url);
+
+            if (result?.list != null)
+            {
+                forecastList = result.list.Take(5).ToList();
+                message = "";
+
+                // ✅ Check upcoming weather conditions
+                bool hasRain = forecastList.Any(f =>
+                    f.weather?[0]?.main?.Contains("Rain") == true);
+                bool hasThunder = forecastList.Any(f =>
+                    f.weather?[0]?.main?.Contains("Thunderstorm") == true);
+                bool hasSnow = forecastList.Any(f =>
+                    f.weather?[0]?.main?.Contains("Snow") == true);
+                bool hasClear = forecastList.Any(f =>
+                    f.weather?[0]?.main?.Contains("Clear") == true);
+                bool hasCloud = forecastList.Any(f =>
+                    f.weather?[0]?.main?.Contains("Cloud") == true);
+
+                double maxTemp = forecastList.Max(f => f.main?.temp ?? 0);
+                double minTemp = forecastList.Min(f => f.main?.temp ?? 0);
+
+                // ✅ Show forecast loaded notification
+                Snackbar.Add($"📍 Forecast loaded for {city.ToUpper()}!",
+                    Severity.Success);
+
+                // ✅ Upcoming weather notifications
+                if (hasThunder)
+                    Snackbar.Add(
+                        "⛈️ Thunderstorm expected in coming days! Stay indoors!",
+                        Severity.Error);
+
+                if (hasRain)
+                    Snackbar.Add(
+                        "🌧️ Rain expected in coming days! Carry an umbrella!",
+                        Severity.Warning);
+
+                if (hasSnow)
+                    Snackbar.Add(
+                        "❄️ Snow expected in coming days! Stay warm!",
+                        Severity.Info);
+
+                if (hasClear && !hasRain && !hasThunder)
+                    Snackbar.Add(
+                        "☀️ Clear skies ahead! Great days coming up!",
+                        Severity.Success);
+
+                if (hasCloud && !hasRain && !hasThunder)
+                    Snackbar.Add(
+                        "☁️ Cloudy days ahead! Carry a light jacket!",
+                        Severity.Normal);
+
+                // ✅ Temperature warnings
+                if (maxTemp > 35)
+                    Snackbar.Add(
+                        $"🥵 Very hot days ahead! Max: {maxTemp}°C. Stay hydrated!",
+                        Severity.Warning);
+
+                if (minTemp < 10)
+                    Snackbar.Add(
+                        $"🥶 Cold days ahead! Min: {minTemp}°C. Wear warm clothes!",
+                        Severity.Info);
+            }
+            else
+            {
+                message = "No forecast data found.";
+                alertSeverity = Severity.Warning;
+            }
+        }
+        catch (Exception ex)
+        {
+            message = "Error: " + ex.Message;
+            alertSeverity = Severity.Error;
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    async Task SaveFavorite()
+    {
+        if (string.IsNullOrWhiteSpace(city) || forecastList == null)
+        {
+            message = "Please search for a city first!";
+            alertSeverity = Severity.Warning;
+            return;
+        }
+
+        var user = supabaseService.GetUser();
+        if (user == null)
+        {
+            message = "Please login to save favorites!";
+            alertSeverity = Severity.Warning;
+            StateHasChanged();
+            await Task.Delay(1000);
+            nav.NavigateTo("/login", forceLoad: true);
+            return;
+        }
+
+        var condition = forecastList.FirstOrDefault()?.weather?[0]?.main ?? "Unknown";
+        supabaseService.FavoriteCity = city;
+        supabaseService.FavoriteWeather = condition;
+
+        // ✅ Save notification
+        Snackbar.Add($"⭐ {city} added to your favorites!", Severity.Success);
+
+        message = $"⭐ {city} saved as favorite!";
+        alertSeverity = Severity.Success;
+        StateHasChanged();
+
+        await Task.Delay(1000);
+        nav.NavigateTo("/dashboard", forceLoad: true);
+    }
+
+    public class ForecastResponse { public List<ForecastItem>? list { get; set; } }
+    public class ForecastItem
+    {
+        public Main? main { get; set; }
+        public WeatherInfo[]? weather { get; set; }
+        public string? dt_txt { get; set; }
+    }
+    public class Main
+    {
+        public double? temp { get; set; }
+        public int? humidity { get; set; }
+    }
+    public class WeatherInfo { public string? main { get; set; } }
+}

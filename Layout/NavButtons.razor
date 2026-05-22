@@ -1,0 +1,45 @@
+﻿@* Desktop horizontal nav buttons *@
+@rendermode InteractiveServer
+@using BlazorApp20.Services
+@inject SupabaseService supabaseService
+@inject NavigationManager nav
+
+@if (isLoggedIn)
+{
+    <MudButton Color="Color.Inherit" Href="/weather"
+               StartIcon="@Icons.Material.Filled.Cloud">Weather</MudButton>
+    <MudButton Color="Color.Inherit" Href="/dashboard"
+               StartIcon="@Icons.Material.Filled.Dashboard">Dashboard</MudButton>
+    <MudButton Color="Color.Inherit" OnClick="SignOut"
+               StartIcon="@Icons.Material.Filled.Logout">Sign Out</MudButton>
+}
+else
+{
+    <MudButton Color="Color.Inherit" Href="/signup"
+               StartIcon="@Icons.Material.Filled.PersonAdd">Sign Up</MudButton>
+    <MudButton Color="Color.Inherit" Href="/login"
+               StartIcon="@Icons.Material.Filled.Login">Sign In</MudButton>
+}
+
+@code {
+    bool isLoggedIn = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await supabaseService.Initialize();
+            await Task.Delay(300);
+            isLoggedIn = supabaseService.IsLoggedIn();
+            StateHasChanged();
+        }
+    }
+
+    async Task SignOut()
+    {
+        await supabaseService.Logout();
+        isLoggedIn = false;
+        StateHasChanged();
+        nav.NavigateTo("/", forceLoad: true);
+    }
+}

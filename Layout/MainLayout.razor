@@ -1,0 +1,144 @@
+﻿@inherits LayoutComponentBase
+@using BlazorApp20.Services
+@inject SupabaseService supabaseService
+@inject NavigationManager nav
+@inject ISnackbar Snackbar
+
+<MudThemeProvider IsDarkMode="ThemeState.IsDark" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Color="Color.Primary" Elevation="2">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                       Color="Color.Inherit"
+                       Edge="Edge.Start"
+                       Class="d-md-none"
+                       OnClick="@(() => drawerOpen = !drawerOpen)" />
+        <MudIcon Icon="@Icons.Material.Filled.WbSunny" Class="mr-2" />
+        <MudText Typo="Typo.h6" Style="font-weight:700;">🌤️ Weather App</MudText>
+        <MudSpacer />
+
+        <!-- Desktop Nav -->
+        <MudButton Color="Color.Inherit"
+                   Href="/"
+                   StartIcon="@Icons.Material.Filled.Home"
+                   Class="d-none d-md-flex">
+            Home
+        </MudButton>
+
+        @if (supabaseService.IsLoggedIn())
+        {
+            <MudButton Color="Color.Inherit"
+                       Href="/weather"
+                       StartIcon="@Icons.Material.Filled.Cloud"
+                       Class="d-none d-md-flex">
+                Weather
+            </MudButton>
+
+            <MudButton Color="Color.Inherit"
+                       Href="/dashboard"
+                       StartIcon="@Icons.Material.Filled.Dashboard"
+                       Class="d-none d-md-flex">
+                Dashboard
+            </MudButton>
+
+            <MudButton Color="Color.Inherit"
+                       OnClick="SignOut"
+                       StartIcon="@Icons.Material.Filled.Logout"
+                       Class="d-none d-md-flex">
+                Sign Out
+            </MudButton>
+        }
+        else
+        {
+            <MudButton Color="Color.Inherit"
+                       Href="/login"
+                       StartIcon="@Icons.Material.Filled.Login"
+                       Class="d-none d-md-flex">
+                Sign In
+            </MudButton>
+        }
+
+        <!-- Theme Toggle -->
+        <MudIconButton Icon="@(ThemeState.IsDark ? Icons.Material.Filled.LightMode : Icons.Material.Filled.DarkMode)"
+                       Color="Color.Inherit"
+                       OnClick="ToggleTheme"
+                       Title="Toggle Dark/Light Mode" />
+    </MudAppBar>
+
+    <!-- Mobile Drawer -->
+    <MudDrawer @bind-Open="drawerOpen"
+               Variant="DrawerVariant.Temporary"
+               Anchor="Anchor.Left"
+               Elevation="2"
+               Class="d-md-none">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6" Style="font-weight:700;">
+                🌤️ Weather App
+            </MudText>
+        </MudDrawerHeader>
+        <MudNavMenu>
+            <MudNavLink Href="/"
+                        Icon="@Icons.Material.Filled.Home"
+                        OnClick="@(() => drawerOpen = false)">
+                Home
+            </MudNavLink>
+
+            @if (supabaseService.IsLoggedIn())
+            {
+                <MudNavLink Href="/weather"
+                            Icon="@Icons.Material.Filled.Cloud"
+                            OnClick="@(() => drawerOpen = false)">
+                    Weather
+                </MudNavLink>
+                <MudNavLink Href="/dashboard"
+                            Icon="@Icons.Material.Filled.Dashboard"
+                            OnClick="@(() => drawerOpen = false)">
+                    Dashboard
+                </MudNavLink>
+                <MudNavLink Icon="@Icons.Material.Filled.Logout"
+                            OnClick="SignOut">
+                    Sign Out
+                </MudNavLink>
+            }
+            else
+            {
+                <MudNavLink Href="/login"
+                            Icon="@Icons.Material.Filled.Login"
+                            OnClick="@(() => drawerOpen = false)">
+                    Sign In
+                </MudNavLink>
+            }
+        </MudNavMenu>
+    </MudDrawer>
+
+    <MudMainContent Class="pt-16 pa-4">
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool drawerOpen = false;
+
+    protected override void OnInitialized()
+    {
+        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.BottomRight;
+        Snackbar.Configuration.VisibleStateDuration = 3000;
+    }
+
+    void ToggleTheme()
+    {
+        ThemeState.IsDark = !ThemeState.IsDark;
+        StateHasChanged();
+    }
+
+    async Task SignOut()
+    {
+        await supabaseService.Logout();
+        Snackbar.Add("👋 You have been signed out successfully!", Severity.Info);
+        await Task.Delay(1000);
+        nav.NavigateTo("/", forceLoad: true);
+    }
+}

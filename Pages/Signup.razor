@@ -1,0 +1,88 @@
+@page "/signup"
+@rendermode InteractiveServer
+@using BlazorApp20.Services
+@inject BlazorApp20.Services.SupabaseService supabaseService
+@inject NavigationManager nav
+
+<div style="
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:80vh;
+    background:linear-gradient(to right, aqua, aqua);">
+    <div style="
+        background:white;
+        padding:30px;
+        border-radius:12px;
+        width:300px;
+        text-align:center;
+        box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+        <h3>Create Account</h3>
+
+        <input @bind="email"
+               placeholder="Email"
+               style="width:100%;padding:8px;margin-bottom:10px;border-radius:6px;border:1px solid gray;" />
+
+        <input @bind="password"
+               type="password"
+               placeholder="Password"
+               style="width:100%;padding:8px;margin-bottom:15px;border-radius:6px;border:1px solid gray;" />
+
+        <button @onclick="HandleRegister"
+                disabled="@isLoading"
+                style="width:100%;padding:10px;background-color:black;color:white;border:none;border-radius:6px;cursor:pointer;">
+            @(isLoading ? "Registering..." : "Register")
+        </button>
+
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <p style="color:@(message.Contains("success") ? "green" : "red");">@message</p>
+        }
+        <hr />
+        <p>Already have an account? <a href="login" style="color:#2196F3;">Login</a></p>
+    </div>
+</div>
+
+@code {
+    string email = "";
+    string password = "";
+    string message = "";
+    bool isLoading = false;
+
+    private async Task HandleRegister()
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            message = "Please enter email and password!";
+            return;
+        }
+
+        isLoading = true;
+        message = "";
+        StateHasChanged();
+
+        try
+        {
+            bool ok = await supabaseService.SignUp(email, password);
+            if (ok)
+            {
+                message = "Registered successfully!";
+                await Task.Delay(800);
+                nav.NavigateTo("/login");
+            }
+            else
+            {
+                message = "Email already exists!";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = "Registration failed: " + ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+}
