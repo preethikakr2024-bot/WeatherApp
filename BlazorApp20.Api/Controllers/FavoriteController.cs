@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 ﻿using BlazorApp20.Api.Models;
 using BlazorApp20.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+=======
+using Microsoft.AspNetCore.Mvc;
+using BlazorApp20.Api.Services;
+using BlazorApp20.Api.Models;
+>>>>>>> 0bb5bb79d79d8c270fc6d65f314bbc3e1d6ac43f
 
 namespace BlazorApp20.Api.Controllers
 {
@@ -20,7 +26,10 @@ namespace BlazorApp20.Api.Controllers
         {
             if (fav == null)
                 return BadRequest("Favorite cannot be null");
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0bb5bb79d79d8c270fc6d65f314bbc3e1d6ac43f
             await _mongo.SaveFavorite(fav);
             return Ok(new { message = "Saved successfully" });
         }
@@ -30,9 +39,16 @@ namespace BlazorApp20.Api.Controllers
         {
             if (string.IsNullOrWhiteSpace(userId))
                 return BadRequest("UserId is required");
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0bb5bb79d79d8c270fc6d65f314bbc3e1d6ac43f
             var data = await _mongo.GetFavorite(userId);
             return Ok(data);
         }
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 0bb5bb79d79d8c270fc6d65f314bbc3e1d6ac43f

@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="MongoDB.Bson" Version="3.8.1" />
+		<PackageReference Include="MongoDB.Driver" Version="2.29.0" />
+		<PackageReference Include="MudBlazor" Version="9.4.0" />
+		<PackageReference Include="Supabase" Version="1.1.1" />
+		<PackageReference Include="supabase-csharp" Version="0.16.2" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Remove="BlazorApp20.Api\**" />
+		<Compile Remove="BlazorApp20.Api\**\*.cs" />
+		<Content Remove="BlazorApp20.Api\**" />
+		<EmbeddedResource Remove="BlazorApp20.Api\**" />
+		<None Remove="BlazorApp20.Api\**" />
+	</ItemGroup>
+</Project>

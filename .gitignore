@@ -2,6 +2,9 @@
 bin/
 obj/
 *.user
+<<<<<<< HEAD
 BlazorApp20/
 BlazorApp19/
 BlazorApp2/
+=======
+>>>>>>> 0bb5bb79d79d8c270fc6d65f314bbc3e1d6ac43f

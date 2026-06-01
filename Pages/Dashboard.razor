@@ -1,0 +1,149 @@
+﻿@page "/dashboard"
+@rendermode InteractiveServer
+@inject SupabaseService supabaseService
+@inject NavigationManager nav
+
+<PageTitle>Dashboard</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
+
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-6" Style="font-weight:700;">
+        📊 Dashboard
+    </MudText>
+
+    @if (!supabaseService.IsLoggedIn())
+    {
+        <MudPaper Elevation="4" Class="pa-8 text-center" Style="border-radius:20px;">
+            <MudIcon Icon="@Icons.Material.Filled.Lock"
+                     Color="Color.Warning" Style="font-size:4rem;" />
+            <MudText Typo="Typo.h5" Class="mt-4" Style="font-weight:600;">
+                Please Login First
+            </MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-2">
+                You need to sign in to view your dashboard
+            </MudText>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       Href="/login"
+                       StartIcon="@Icons.Material.Filled.Login"
+                       Class="mt-6"
+                       Style="border-radius:12px;">
+                Sign In
+            </MudButton>
+        </MudPaper>
+    }
+    else
+    {
+        <MudPaper Elevation="4" Class="pa-6 mb-6"
+                  Style="border-radius:20px; background:linear-gradient(135deg,#1a237e,#3949ab);">
+            <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween">
+                <MudStack Spacing="1">
+                    <MudText Typo="Typo.h5" Style="color:white; font-weight:700;">
+                        👋 Welcome Back!
+                    </MudText>
+                    <MudText Typo="Typo.body2" Style="color:rgba(255,255,255,0.8);">
+                        Here's your saved weather info
+                    </MudText>
+                </MudStack>
+                <MudAvatar Color="Color.Warning" Size="Size.Large">
+                    <MudIcon Icon="@Icons.Material.Filled.Person" />
+                </MudAvatar>
+            </MudStack>
+        </MudPaper>
+
+        <MudGrid Class="mb-6">
+            <MudItem xs="12" sm="6">
+                <MudCard Elevation="4" Style="border-radius:16px; border-left:4px solid #3949ab;">
+                    <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudAvatar Color="Color.Primary">
+                                <MudIcon Icon="@Icons.Material.Filled.LocationOn" />
+                            </MudAvatar>
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6" Style="font-weight:600;">
+                                📍 Favorite City
+                            </MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h4" Color="Color.Primary" Style="font-weight:700;">
+                            @(string.IsNullOrEmpty(supabaseService.FavoriteCity)
+                                ? "Not Set" : supabaseService.FavoriteCity.ToUpper())
+                        </MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-2">
+                            Your saved favorite city
+                        </MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.Search"
+                                   Href="/weather"
+                                   Style="border-radius:8px;">
+                            Check Weather
+                        </MudButton>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudCard Elevation="4" Style="border-radius:16px; border-left:4px solid #fb8c00;">
+                    <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudAvatar Color="Color.Warning">
+                                <MudIcon Icon="@Icons.Material.Filled.WbSunny" />
+                            </MudAvatar>
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6" Style="font-weight:600;">
+                                🌤️ Favorite Weather
+                            </MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText Typo="Typo.h4" Color="Color.Warning" Style="font-weight:700;">
+                            @(string.IsNullOrEmpty(supabaseService.FavoriteWeather)
+                                ? "Not Set" : supabaseService.FavoriteWeather)
+                        </MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mt-2">
+                            Your saved weather condition
+                        </MudText>
+                    </MudCardContent>
+                    <MudCardActions>
+                        <!-- ✅ FIXED - replaced MudChip with MudText -->
+                        <MudText Typo="Typo.body2" Color="Color.Warning" Style="font-weight:600;">
+                            @(string.IsNullOrEmpty(supabaseService.FavoriteWeather)
+                                ? "No data yet" : "✓ Saved")
+                        </MudText>
+                    </MudCardActions>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+
+        <MudPaper Elevation="3" Class="pa-4" Style="border-radius:16px;">
+            <MudText Typo="Typo.h6" Class="mb-4" Style="font-weight:600;">
+                ⚡ Quick Actions
+            </MudText>
+            <MudStack Row="true" Spacing="3">
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.Search"
+                           Href="/weather"
+                           Style="border-radius:10px;">
+                    Check Weather
+                </MudButton>
+            </MudStack>
+        </MudPaper>
+    }
+
+</MudContainer>
+
+@code {
+    async Task SignOut()
+    {
+        await supabaseService.Logout();
+        nav.NavigateTo("/", forceLoad: true);
+    }
+}

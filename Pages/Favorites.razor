@@ -1,0 +1,55 @@
+﻿@page "/favorites"
+@rendermode InteractiveServer
+@using BlazorApp20.Services
+@inject AuthService authService
+@inject SupabaseService supabaseService
+
+<h3>My Favorites</h3>
+
+@if (!authService.IsLoggedIn)
+{
+    <p>Please <a href="/login">login</a> first.</p>
+}
+else
+{
+    <EditForm Model="@model" OnValidSubmit="Save">
+        <InputText @bind-Value="model.City" placeholder="Favorite City" />
+        <InputText @bind-Value="model.Weather" placeholder="Favorite Weather" />
+        <button type="submit">Save</button>
+    </EditForm>
+    <hr />
+    <p><b>Saved City:</b> @supabaseService.FavoriteCity</p>
+    <p><b>Saved Weather:</b> @supabaseService.FavoriteWeather</p>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <p style="color:green">@message</p>
+    }
+}
+
+@code {
+    private FavModel model = new();
+    private string message = "";
+
+    protected override void OnInitialized()
+    {
+        // ✅ Load saved values from SupabaseService
+        model.City = supabaseService.FavoriteCity;
+        model.Weather = supabaseService.FavoriteWeather;
+    }
+
+    private void Save()
+    {
+        // ✅ Save to SupabaseService (in-memory for now)
+        supabaseService.FavoriteCity = model.City;
+        supabaseService.FavoriteWeather = model.Weather;
+        message = "Saved successfully!";
+        StateHasChanged();
+    }
+
+    public class FavModel
+    {
+        public string City { get; set; } = "";
+        public string Weather { get; set; } = "";
+    }
+}

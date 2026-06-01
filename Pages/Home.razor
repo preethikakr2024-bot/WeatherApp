@@ -1,0 +1,196 @@
+﻿@page "/"
+@rendermode InteractiveServer
+<PageTitle>Weather App</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-6">
+
+    <!-- HERO SECTION -->
+    <MudPaper Elevation="6" Class="pa-8 mb-6"
+              Style="border-radius:24px; background: linear-gradient(135deg, #1a237e, #3949ab);">
+        <MudStack AlignItems="AlignItems.Center" Spacing="4">
+            <MudText Typo="Typo.h3" Style="color:white; font-weight:700;">
+                🌤️ Weather App
+            </MudText>
+            <MudText Typo="Typo.h6" Style="color:rgba(255,255,255,0.8);">
+                Real-time weather updates and 5-day forecasts instantly
+            </MudText>
+                    </MudStack>
+    </MudPaper>
+
+    <!-- STATS -->
+    <MudGrid Class="mb-6">
+        <MudItem xs="12" sm="4">
+            <MudCard Elevation="4" Style="border-radius:16px;">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.LocationCity"
+                             Color="Color.Primary" Size="Size.Large" />
+                    <MudText Typo="Typo.h4" Color="Color.Primary"
+                             Style="font-weight:700;">200+</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Cities Supported
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudCard Elevation="4" Style="border-radius:16px;">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.CalendarMonth"
+                             Color="Color.Success" Size="Size.Large" />
+                    <MudText Typo="Typo.h4" Color="Color.Success"
+                             Style="font-weight:700;">5</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Day Forecast
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudCard Elevation="4" Style="border-radius:16px;">
+                <MudCardContent Class="text-center">
+                    <MudIcon Icon="@Icons.Material.Filled.Autorenew"
+                             Color="Color.Warning" Size="Size.Large" />
+                    <MudText Typo="Typo.h4" Color="Color.Warning"
+                             Style="font-weight:700;">24/7</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Live Updates
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+    <!-- FEATURES -->
+    
+    <MudGrid>
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="4" Style="border-radius:16px;">
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudAvatar Color="Color.Primary" Size="Size.Large">
+                            <MudIcon Icon="@Icons.Material.Filled.Cloud" />
+                        </MudAvatar>
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Style="font-weight:600;">
+                            Live Weather
+                        </MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Get current weather conditions for any city in the world instantly.
+                    </MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Primary"
+                               Href="/weather"
+                               EndIcon="@Icons.Material.Filled.ArrowForward">
+                        Check Now
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="4" Style="border-radius:16px;">
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudAvatar Color="Color.Success" Size="Size.Large">
+                            <MudIcon Icon="@Icons.Material.Filled.DateRange" />
+                        </MudAvatar>
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Style="font-weight:600;">
+                            5-Day Forecast
+                        </MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Plan your week ahead with detailed 5-day weather forecasts.
+                    </MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Success"
+                               Href="/weather"
+                               EndIcon="@Icons.Material.Filled.ArrowForward">
+                        View Forecast
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="4" Style="border-radius:16px;">
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudAvatar Color="Color.Error" Size="Size.Large">
+                            <MudIcon Icon="@Icons.Material.Filled.Favorite" />
+                        </MudAvatar>
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Style="font-weight:600;">
+                            Favorites
+                        </MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Save your favorite cities for quick weather access anytime.
+                    </MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Error"
+                               Href="/favorites"
+                               EndIcon="@Icons.Material.Filled.ArrowForward">
+                        My Cities
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" sm="6" md="3">
+            <MudCard Elevation="4" Style="border-radius:16px;">
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudAvatar Color="Color.Warning" Size="Size.Large">
+                            <MudIcon Icon="@Icons.Material.Filled.Person" />
+                        </MudAvatar>
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6" Style="font-weight:600;">
+                            User Login
+                        </MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Sign in to save preferences and favorite cities securely.
+                    </MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Text"
+                               Color="Color.Warning"
+                               Href="/login"
+                               EndIcon="@Icons.Material.Filled.ArrowForward">
+                        Sign In
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+
+    <!-- FOOTER -->
+    <MudDivider Class="mt-8 mb-4" />
+    <MudStack Row="true" Justify="Justify.Center" AlignItems="AlignItems.Center">
+        <MudIcon Icon="@Icons.Material.Filled.Public" Color="Color.Secondary" />
+        <MudText Typo="Typo.body2" Color="Color.Secondary">
+            Powered by OpenWeatherMap API • Built with Blazor & MudBlazor
+        </MudText>
+    </MudStack>
+
+</MudContainer>
